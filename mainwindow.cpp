@@ -309,7 +309,8 @@ static char * watch_7_xpm[] = {
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    running_task_item(NULL)
 {
     ui->setupUi(this);
     load();
@@ -337,8 +338,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeWidget->setColumnHidden(3,true);
     ui->treeWidget->setColumnHidden(4,true);
     QTreeWidgetItem *item1 = ui->treeWidget->headerItem();
-    item1->setText(1, QApplication::translate("MainWindow", "", 0, QApplication::UnicodeUTF8));
-    item1->setText(2, QApplication::translate("MainWindow", "time (hh:mm:ss)", 0, QApplication::UnicodeUTF8));
+    item1->setText(1, tr(""));
+    item1->setText(2, tr("time (hh:mm:ss)"));
 }
 
 MainWindow::~MainWindow()
@@ -404,7 +405,13 @@ void MainWindow::slotaddtask()
 {
     taskDialog* taskdialog=new taskDialog();
     taskdialog->exec();
-    if (taskdialog->hasaccepted()) ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(QStringList(taskdialog->text())));
+    if (taskdialog->hasaccepted()) {
+        QTreeWidgetItem *tree_task = new QTreeWidgetItem(QStringList(taskdialog->text()));
+        tree_task->setText(2, "00:00:00");
+        tree_task->setText(3, QDateTime::currentDateTime().toString());
+        tree_task->setText(4, "00:00:00");
+        ui->treeWidget->addTopLevelItem(tree_task);
+    }
     save();
     ui->treeWidget->resizeColumnToContents(0);
 }
@@ -413,10 +420,14 @@ void MainWindow::slotstarttiming()
 {
     if (ui->treeWidget->currentItem())
     {
-        ui->treeWidget->currentItem()->setIcon(1,qi_watch[0]);
-        ui->treeWidget->currentItem()->setText(3,QDateTime::currentDateTime().toString());
-        ui->treeWidget->currentItem()->setText(4,ui->treeWidget->currentItem()->text(2));
-        timer->start(1000);
+        if (!running_task_item) {
+            running_task_item = ui->treeWidget->currentItem();
+            running_task_item->setIcon(1, qi_watch[0]);
+            running_task_item->setText(3, QDateTime::currentDateTime().toString());
+            running_task_item->setText(4, running_task_item->text(2));
+            timer->start(1000);
+        }
+        /* silently ignore action if a task already running */
     }
     else QMessageBox::information(0,"Info","First select a task that you want to start timing for.");
 }
@@ -434,20 +445,21 @@ QString timestring(int seconds)
 
 void MainWindow::slotstoptiming()
 {
-    if (ui->treeWidget->currentItem())
+    if (running_task_item)
     {
-        if (!ui->treeWidget->currentItem()->text(3).isEmpty())
+        if (!running_task_item->text(3).isEmpty())
         { // task is really running
             timer->stop();
             const QPixmap pm_watch_0(watch_0_xpm);
             QIcon qi_watch_0(pm_watch_0);
-            ui->treeWidget->currentItem()->setIcon(1,QIcon());
-            QDateTime laststart=QDateTime::fromString(ui->treeWidget->currentItem()->text(3));
+            running_task_item->setIcon(1,QIcon());
+            QDateTime laststart=QDateTime::fromString(running_task_item->text(3));
             QDateTime now=QDateTime::currentDateTime();
             int time=laststart.secsTo(now);
-            ui->treeWidget->currentItem()->setText(3,QString()); // mark task as not running
+            running_task_item->setText(3,QString()); // mark task as not running
         }
         save();
+        running_task_item = NULL;
     }
 }
 
@@ -460,10 +472,14 @@ void MainWindow::slotdeletetask()
 
 void MainWindow::slottimer()
 {
-    static int turn=0;
-    if (++turn>=8) turn-=8;
-    ui->treeWidget->topLevelItem(runningtaskindex())->setIcon(1,qi_watch[turn]);
-    ui->treeWidget->currentItem()->setText(2,timestring(timestringtoseconds(ui->treeWidget->currentItem()->text(4))+QDateTime::fromString(ui->treeWidget->currentItem()->text(3)).secsTo(QDateTime::currentDateTime())));
+    if (running_task_item) {
+        static int turn=0;
+        if (++turn>=8) turn-=8;
+        running_task_item->setIcon(1,qi_watch[turn]);
+        QString last_time_sum = running_task_item->text(4);
+        QString start_time_str = running_task_item->text(3);
+        running_task_item->setText(2,timestring(timestringtoseconds(last_time_sum) + QDateTime::fromString(start_time_str).secsTo(QDateTime::currentDateTime())));
+    }
 }
 
 QString MainWindow::save()

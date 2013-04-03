@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QTreeWidgetItem>
 
 namespace Ui {
     class MainWindow;
@@ -21,6 +22,7 @@ private:
     Ui::MainWindow *ui;
     QTimer *timer;
     QIcon qi_watch[8];
+    QTreeWidgetItem *running_task_item;
 
 private slots:
     QString save();
