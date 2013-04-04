@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QTreeWidgetItem>
+#include <QDir>
 
 namespace Ui {
     class MainWindow;
@@ -19,10 +20,15 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
+    void getBaseDir(void);
+
+private:
     Ui::MainWindow *ui;
     QTimer *timer;
     QIcon qi_watch[8];
     QTreeWidgetItem *running_task_item;
+    /** \brief Base dir for storing the times file */
+    QDir *base_dir;
 
 private slots:
     QString save();

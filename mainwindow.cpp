@@ -310,7 +310,8 @@ static char * watch_7_xpm[] = {
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    running_task_item(NULL)
+    running_task_item(NULL),
+    base_dir(NULL)
 {
     ui->setupUi(this);
     load();
@@ -379,6 +380,53 @@ void MainWindow::changeEvent(QEvent *e)
         default:
             break;
     }
+}
+
+/** \brief Get the base directory for working with
+ *
+ * This functions fills the member base_dir with the directory we will use.
+ * Typically this will be the directory '.qtt' in the home directory.
+ * If we can't detect the home directory or won't be able to create '.qtt'
+ * we use the current directory.
+ */
+void MainWindow::getBaseDir(void) {
+
+    /* determine the users home dir; the path should be larger then 4 characters (C:\ under win) */
+    if (3 >= QDir::homePath().length()) {
+        base_dir = new QDir(QDir().current());
+        return;
+    }
+
+#ifdef  Q_OS_WIN
+    QString app_dir("Qtt");
+#else
+    QString app_dir(".qtt");
+#endif
+    base_dir = new QDir(QDir().home());
+    if (!base_dir->cd(".qtt")) {
+        /* does not exist, create one */
+        if (!base_dir->mkdir(app_dir)) {
+            ui->statusBar->showMessage(QString(tr("WRN: unable to make dir: ")).append(base_dir->absolutePath()).append(QString("/")).append(app_dir), 20000);
+            /* fall back to current dir */
+            base_dir = new QDir(QDir().current());
+            return;
+        }
+
+        if (!base_dir->cd(app_dir)) {
+            /* something went strange: we created the dir but can not change into it */
+            ui->statusBar->showMessage(QString(tr("can not change into dir: ")).append(base_dir->absolutePath()).append(QString("/")).append(app_dir), 20000);
+            /* fall back to current dir */
+            base_dir = new QDir(QDir().current());
+            return;
+        }
+
+        ui->statusBar->showMessage(QString(tr("created new dir: ")).append(base_dir->absolutePath()), 10000);
+    }
+
+    /* test if the selected dir is not writable for us */
+    QFileInfo wrtest(base_dir->absolutePath());
+    if (!wrtest.isWritable())
+        base_dir = new QDir(QDir().current());
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -486,7 +534,8 @@ QString MainWindow::save()
 {
     QString err;
     int i;
-    QFile file1(QString("qtimetracker.txt"));
+    if (!base_dir)  getBaseDir();
+    QFile file1(base_dir->filePath("qtimetracker.txt"));
     if (!file1.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text)) err=QString("Could not open file");
     else
     {
@@ -504,7 +553,9 @@ QString MainWindow::save()
 QString MainWindow::load()
 {
     QString err;
-    QFile file1(QString("qtimetracker.txt"));
+
+    if (!base_dir)  getBaseDir();
+    QFile file1(base_dir->filePath("qtimetracker.txt"));
     if (!file1.open(QIODevice::ReadOnly | QIODevice::Text)) err=QString("Could not open file");
     else
     {
