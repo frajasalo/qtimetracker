@@ -314,6 +314,7 @@ MainWindow::MainWindow(QWidget *parent) :
     base_dir(NULL)
 {
     ui->setupUi(this);
+    getOptions();
     load();
     prepareicons();
     timer=new QTimer();
@@ -427,6 +428,25 @@ void MainWindow::getBaseDir(void) {
     QFileInfo wrtest(base_dir->absolutePath());
     if (!wrtest.isWritable())
         base_dir = new QDir(QDir().current());
+}
+
+/** \brief Extract the options for runtime
+ *
+ * For the moment parse the command line arguments of the programm for the
+ * known options:
+ * -p - use the current dir as "project" dir and load and save the "times"-file
+ *      from it.
+ */
+void MainWindow::getOptions(void) {
+
+    QStringList cmd_line_args = QCoreApplication::arguments();
+    for (int i = 0; i < cmd_line_args.length(); ++i) {
+        /* -p - project dir option */
+        if ("-p" == cmd_line_args.at(i)) {
+            /* use the current dir as "project" directory */
+            base_dir = new QDir(QDir().current());
+        }
+    }
 }
 
 void MainWindow::on_actionQuit_triggered()

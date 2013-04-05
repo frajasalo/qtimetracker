@@ -21,6 +21,7 @@ protected:
 
 private:
     void getBaseDir(void);
+    void getOptions(void);
 
 private:
     Ui::MainWindow *ui;
