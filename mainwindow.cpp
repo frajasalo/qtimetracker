@@ -273,7 +273,7 @@ void MainWindow::getBaseDir(void) {
     QString app_dir(".qtt");
 #endif
     base_dir = new QDir(QDir().home());
-    if (!base_dir->cd(".qtt")) {
+    if (!base_dir->cd(app_dir)) {
         /* does not exist, create one */
         if (!base_dir->mkdir(app_dir)) {
             ui->statusBar->showMessage(QString(tr("WRN: unable to make dir: ")).append(base_dir->absolutePath()).append(QString("/")).append(app_dir), 20000);
