@@ -65,6 +65,9 @@
     </item>
     <item row="0" column="5">
      <widget class="QCommandLinkButton" name="btn_settings">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Settings</string>
       </property>
