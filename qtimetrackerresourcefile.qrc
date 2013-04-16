@@ -1,5 +1,10 @@
 <RCC>
-    <qresource prefix="/new/prefix1">
-        <file>qtimetracker-icon.png</file>
+    <qresource prefix="/gui/icons">
+        <file>svg/task_add.svg</file>
+        <file>svg/task_settings.svg</file>
+        <file>svg/task_start.svg</file>
+        <file>svg/task_stop.svg</file>
+        <file>svg/task_delete.svg</file>
+        <file>svg/app_icon.svg</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>692</width>
+    <width>908</width>
     <height>400</height>
    </rect>
   </property>
@@ -15,32 +15,66 @@
   </property>
   <property name="windowIcon">
    <iconset resource="qtimetrackerresourcefile.qrc">
-    <normaloff>:/new/prefix1/qtimetracker-icon.png</normaloff>:/new/prefix1/qtimetracker-icon.png</iconset>
+    <normaloff>:/gui/icons/svg/app_icon.svg</normaloff>:/gui/icons/svg/app_icon.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1">
+     <widget class="QCommandLinkButton" name="btn_starttimer">
+      <property name="text">
+       <string>Start timer</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qtimetrackerresourcefile.qrc">
+        <normaloff>:/gui/icons/svg/task_start.svg</normaloff>:/gui/icons/svg/task_start.svg</iconset>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QCommandLinkButton" name="btn_addtask">
       <property name="text">
        <string>Add a task</string>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QCommandLinkButton" name="btn_stoptimer">
-      <property name="text">
-       <string>Stop timer</string>
+      <property name="icon">
+       <iconset resource="qtimetrackerresourcefile.qrc">
+        <normaloff>:/gui/icons/svg/task_add.svg</normaloff>:/gui/icons/svg/task_add.svg</iconset>
       </property>
      </widget>
     </item>
     <item row="0" column="3">
+     <widget class="QCommandLinkButton" name="btn_stoptimer">
+      <property name="text">
+       <string>Stop timer</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qtimetrackerresourcefile.qrc">
+        <normaloff>:/gui/icons/svg/task_stop.svg</normaloff>:/gui/icons/svg/task_stop.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
      <widget class="QCommandLinkButton" name="btn_deletetask">
       <property name="text">
        <string>Delete task</string>
       </property>
+      <property name="icon">
+       <iconset resource="qtimetrackerresourcefile.qrc">
+        <normaloff>:/gui/icons/svg/task_delete.svg</normaloff>:/gui/icons/svg/task_delete.svg</iconset>
+      </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="4">
+    <item row="0" column="5">
+     <widget class="QCommandLinkButton" name="btn_settings">
+      <property name="text">
+       <string>Settings</string>
+      </property>
+      <property name="icon">
+       <iconset resource="qtimetrackerresourcefile.qrc">
+        <normaloff>:/gui/icons/svg/task_settings.svg</normaloff>:/gui/icons/svg/task_settings.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="6">
      <widget class="QTreeWidget" name="treeWidget">
       <property name="font">
        <font>
@@ -71,13 +105,6 @@
         <string>time</string>
        </property>
       </column>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QCommandLinkButton" name="btn_starttimer">
-      <property name="text">
-       <string>Start timer</string>
-      </property>
      </widget>
     </item>
    </layout>

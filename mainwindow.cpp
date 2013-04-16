@@ -11,123 +11,6 @@
   Column 4 holds the time of the task when it was started.
   */
 
-// Gallery of unmodern art
-static char *ch_new[] = {
-/* columns rows colors chars-per-pixel */
-"22 22 2 1",
-"+ c #009900",
-"  c None",
-/* pixels */
-"                      ",
-"                      ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"  ++++++++++++++++++  ",
-"  ++++++++++++++++++  ",
-"  ++++++++++++++++++  ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"         +++          ",
-"                      ",
-"                      ",
-"                      ",
-};
-static char *ch_start[] = {
-/* columns rows colors chars-per-pixel */
-"22 22 2 1",
-"+ c #009900",
-"  c None",
-/* pixels */
-"                      ",
-"                      ",
-"      ++              ",
-"      +++             ",
-"      ++++            ",
-"      +++++           ",
-"      ++++++          ",
-"      +++++++         ",
-"      ++++++++        ",
-"      +++++++++       ",
-"      ++++++++++      ",
-"      +++++++++       ",
-"      ++++++++        ",
-"      +++++++         ",
-"      ++++++          ",
-"      +++++           ",
-"      ++++            ",
-"      +++             ",
-"      ++              ",
-"                      ",
-"                      ",
-"                      ",
-};
-static char *ch_stop[] = {
-/* columns rows colors chars-per-pixel */
-"22 22 2 1",
-"+ c #404040",
-"  c None",
-/* pixels */
-"                      ",
-"                      ",
-"                      ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"   ++++++++++++++++   ",
-"                      ",
-"                      ",
-"                      ",
-};
-static char *ch_delete[] = {
-/* columns rows colors chars-per-pixel */
-"22 22 2 1",
-"+ c #900000",
-"  c None",
-/* pixels */
-"                      ",
-"                      ",
-"  +++             +++ ",
-"  ++++           ++++ ",
-"   ++++         ++++  ",
-"    ++++       ++++   ",
-"     ++++     ++++    ",
-"      ++++   ++++     ",
-"       ++++ ++++      ",
-"        +++++++       ",
-"         +++++        ",
-"         +++++         ",
-"         +++++        ",
-"        +++++++       ",
-"       ++++ ++++      ",
-"      ++++   ++++     ",
-"     ++++     ++++    ",
-"    ++++       ++++   ",
-"   ++++         ++++  ",
-"  ++++           ++++ ",
-"                      ",
-"                      ",
-};
 // watches (c) 2000 by blacky, see http://websvn.kde.org/trunk/KDE/kdepim/ktimetracker/pics/watch-0.xpm?view=log
 static char * watch_0_xpm[] = {
 "15 13 7 1",
@@ -319,20 +202,6 @@ MainWindow::MainWindow(QWidget *parent) :
     prepareicons();
     timer=new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(slottimer()));
-    const QPixmap pm_watch_0(watch_0_xpm);
-    QIcon qi_watch_0(pm_watch_0);
-    const QPixmap pm_new(ch_new);
-    QIcon qi_new(pm_new);
-    ui->btn_addtask->setIcon(qi_new);
-    const QPixmap pm_start(ch_start);
-    QIcon qi_start(pm_start);
-    ui->btn_starttimer->setIcon(qi_start);
-    const QPixmap pm_stop(ch_stop);
-    QIcon qi_stop(pm_stop);
-    ui->btn_stoptimer->setIcon(qi_stop);
-    const QPixmap pm_delete(ch_delete);
-    QIcon qi_delete(pm_delete);
-    ui->btn_deletetask->setIcon(qi_delete);
     ui->treeWidget->resizeColumnToContents(0);
     ui->treeWidget->header()->resizeSection(1,20);
     ui->treeWidget->header()->resizeSection(2,50);
@@ -518,12 +387,7 @@ void MainWindow::slotstoptiming()
         if (!running_task_item->text(3).isEmpty())
         { // task is really running
             timer->stop();
-            const QPixmap pm_watch_0(watch_0_xpm);
-            QIcon qi_watch_0(pm_watch_0);
             running_task_item->setIcon(1,QIcon());
-            QDateTime laststart=QDateTime::fromString(running_task_item->text(3));
-            QDateTime now=QDateTime::currentDateTime();
-            int time=laststart.secsTo(now);
             running_task_item->setText(3,QString()); // mark task as not running
         }
         save();
