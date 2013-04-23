@@ -375,9 +375,19 @@ int timestringtoseconds(QString timestring)
     return qtime1.hour()*3600+qtime1.minute()*60+qtime1.second();
 }
 
+/** \brief Convert a value of seconds into a time string
+ *  \param seconds Seconds to convert into time string
+ *  \return The time string as QString
+ *
+ * Extracts the hours from thevalue of seconds and substracts
+ * the hours immediately because QTime seems to have problems
+ * if the minute value is greater than 60.
+ */
 QString timestring(int seconds)
 {
-    return QTime((int)(seconds/3600),(int)(seconds/60),seconds%60).toString();
+    int sec_h = (int)(seconds / 3600);
+    seconds -= sec_h * 3600;
+    return QTime(sec_h, (int)(seconds / 60), (int)(seconds % 60)).toString();
 }
 
 void MainWindow::slotstoptiming()
@@ -408,9 +418,17 @@ void MainWindow::slottimer()
         static int turn=0;
         if (++turn>=8) turn-=8;
         running_task_item->setIcon(1,qi_watch[turn]);
+        /* last saved value */
         QString last_time_sum = running_task_item->text(4);
-        QString start_time_str = running_task_item->text(3);
-        running_task_item->setText(2,timestring(timestringtoseconds(last_time_sum) + QDateTime::fromString(start_time_str).secsTo(QDateTime::currentDateTime())));
+        int last_time_sum_sec = timestringtoseconds(last_time_sum);
+        /* last start time of the timer */
+        QString last_start_time_str = running_task_item->text(3);
+        /* seconds from last start time of the timer to the current time */
+        int curr_time_sec = QDateTime::fromString(last_start_time_str).secsTo(QDateTime::currentDateTime());
+        /* finally get the time string from last saved value plus seconds from last timer start */
+        QString new_time_string = timestring(last_time_sum_sec + curr_time_sec);
+        /* set the string into the gui */
+        running_task_item->setText(2, new_time_string);
     }
 }
 
