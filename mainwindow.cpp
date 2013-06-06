@@ -25,6 +25,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "taskdialog.h"
+#include "support.h"
 
 /*
   A task is marked as running using column 3. Column 3 holds the time when the task was started if it is running.
@@ -389,27 +390,6 @@ void MainWindow::slotstarttiming()
     else QMessageBox::information(0,"Info","First select a task that you want to start timing for.");
 }
 
-int timestringtoseconds(QString timestring)
-{
-    QTime qtime1=QTime::fromString(timestring);
-    return qtime1.hour()*3600+qtime1.minute()*60+qtime1.second();
-}
-
-/** \brief Convert a value of seconds into a time string
- *  \param seconds Seconds to convert into time string
- *  \return The time string as QString
- *
- * Extracts the hours from thevalue of seconds and substracts
- * the hours immediately because QTime seems to have problems
- * if the minute value is greater than 60.
- */
-QString timestring(int seconds)
-{
-    int sec_h = (int)(seconds / 3600);
-    seconds -= sec_h * 3600;
-    return QTime(sec_h, (int)(seconds / 60), (int)(seconds % 60)).toString();
-}
-
 void MainWindow::slotstoptiming()
 {
     if (running_task_item)
@@ -446,7 +426,7 @@ void MainWindow::slottimer()
         /* seconds from last start time of the timer to the current time */
         int curr_time_sec = QDateTime::fromString(last_start_time_str).secsTo(QDateTime::currentDateTime());
         /* finally get the time string from last saved value plus seconds from last timer start */
-        QString new_time_string = timestring(last_time_sum_sec + curr_time_sec);
+        QString new_time_string = secondstotimestring(last_time_sum_sec + curr_time_sec);
         /* set the string into the gui */
         running_task_item->setText(2, new_time_string);
     }
