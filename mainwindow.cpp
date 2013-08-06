@@ -27,6 +27,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "taskdialog.h"
+#include "support.h"
 
 /*
   A task is marked as running using column 3. Column 3 holds the time when the task was started if it is running.
@@ -485,11 +486,6 @@ int timestringtoseconds(QString timestring)
 {
     QTime qtime1=QTime::fromString(timestring);
     return qtime1.hour()*3600+qtime1.minute()*60+qtime1.second();
-}
-
-QString timestring(int seconds)
-{
-    return QTime((int)(seconds/3600),(int)(seconds/60)%60,seconds%60).toString();
 }
 
 void MainWindow::slotstarttiming()
