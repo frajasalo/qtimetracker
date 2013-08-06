@@ -1,0 +1,6 @@
+To build the tests, execute the following commands in the subdirectories:
+
+$> qmake -project "CONFIG += qtestlib"
+$> qmake
+$> make
+
