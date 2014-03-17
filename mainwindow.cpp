@@ -520,9 +520,9 @@ void MainWindow::slotstarttiming()
     stopalltimers();
     if (ui->treeWidget->currentItem())
     {
-        ui->treeWidget->currentItem()->setIcon(coltimericon,qi_watch[0]);
-        ui->treeWidget->currentItem()->setText(collaststart,QDateTime::currentDateTime().toString());
-        ui->treeWidget->currentItem()->setText(collasttime,ui->treeWidget->currentItem()->text(coltime));
+        ui->treeWidget->currentItem()->setIcon(coltimericon, qi_watch[0]);
+        ui->treeWidget->currentItem()->setText(collaststart, QString::number(QDateTime::currentDateTime().toTime_t()));
+        ui->treeWidget->currentItem()->setText(collasttime, ui->treeWidget->currentItem()->text(coltime));
         oldtimeinseconds=-1; // dear slottimer, please note the current time column
         timer->start(1000);
     }
@@ -573,11 +573,11 @@ void MainWindow::slottimer()
     // time calculation
     if (oldtimeinseconds==-1)
     {
-        oldtimeinseconds=timestringtoseconds(ui->treeWidget->topLevelItem(runningtaskindex())->text(coltime));
+        oldtimeinseconds = timestringtoseconds(ui->treeWidget->topLevelItem(runningtaskindex())->text(coltime));
     }
-    QDateTime laststart=QDateTime::fromString(ui->treeWidget->topLevelItem(runningtaskindex())->text(collaststart));
-    int secondspassed=laststart.secsTo(QDateTime::currentDateTime());
-    ui->treeWidget->topLevelItem(runningtaskindex())->setText(coltime,timestring(secondspassed+oldtimeinseconds));
+    uint laststart = ui->treeWidget->topLevelItem(runningtaskindex())->text(collaststart).toUInt();
+    uint curr_time = oldtimeinseconds + QDateTime::currentDateTime().toTime_t() - laststart;
+    ui->treeWidget->topLevelItem(runningtaskindex())->setText(coltime, timestring(curr_time));
 }
 
 QString MainWindow::save()
