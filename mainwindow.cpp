@@ -481,15 +481,38 @@ void MainWindow::slotaddtask()
     }
 }
 
+/** \brief Convert a time string to a value of seconds
+ *  \param timestring the time string to convert
+ *  \return value of seconds converted from time string
+ *
+ * The expected time string should be
+ *   HH:MM:SS
+ * where HH stands for the hour, MM for the minute and SS for
+ * the seconds.
+ */
 int timestringtoseconds(QString timestring)
 {
-    QTime qtime1=QTime::fromString(timestring);
-    return qtime1.hour()*3600+qtime1.minute()*60+qtime1.second();
+    QStringList time_elements = timestring.split(':');
+    if (3 != time_elements.length())
+        return 0;
+    /* calculate the soconds from the single values */
+    int seconds = time_elements[0].toInt() * 60 * 60;
+    seconds += time_elements[1].toInt() * 60;
+    seconds += time_elements[2].toInt();
+    return seconds;
 }
 
+/** \brief Convert a value of seconds to a readable time string
+ *  \param seconds the value of seconds to convert
+ *  \return time string in the form HH:MM:SS
+ */
 QString timestring(int seconds)
 {
-    return QTime((int)(seconds/3600),(int)(seconds/60)%60,seconds%60).toString();
+    int days = seconds / (24 * 60 * 60);
+    seconds -= days * (24 * 60 * 60);
+    QTime time = QTime((int)(seconds / 3600), (int)(seconds / 60) % 60, seconds % 60);
+    QString answer;
+    return answer.sprintf("%02d:%02d:%02d", days * 24 + time.hour(), time.minute(), time.second());
 }
 
 void MainWindow::slotstarttiming()
