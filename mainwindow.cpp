@@ -34,7 +34,7 @@
   */
 
 // Gallery of unmodern art
-static char *ch_new[] = {
+static const char *ch_new[] = {
 /* columns rows colors chars-per-pixel */
 "22 22 2 1",
 "+ c #009900",
@@ -63,7 +63,7 @@ static char *ch_new[] = {
 "                      ",
 "                      ",
 };
-static char *ch_start[] = {
+static const char *ch_start[] = {
 /* columns rows colors chars-per-pixel */
 "22 22 2 1",
 "+ c #009900",
@@ -92,7 +92,7 @@ static char *ch_start[] = {
 "                      ",
 "                      ",
 };
-static char *ch_stop[] = {
+static const char *ch_stop[] = {
 /* columns rows colors chars-per-pixel */
 "22 22 2 1",
 "+ c #404040",
@@ -121,7 +121,7 @@ static char *ch_stop[] = {
 "                      ",
 "                      ",
 };
-static char *ch_delete[] = {
+static const char *ch_delete[] = {
 /* columns rows colors chars-per-pixel */
 "22 22 2 1",
 "+ c #900000",
@@ -150,7 +150,7 @@ static char *ch_delete[] = {
 "                      ",
 "                      ",
 };
-static char* ch_complete[] =  {
+static const char *ch_complete[] =  {
         "15 13 7 1",
         "       c None",
         ".      c #000000",
@@ -174,7 +174,7 @@ static char* ch_complete[] =  {
         "    +          "};
 
 // watches (c) 2000 by blacky, see http://websvn.kde.org/trunk/KDE/kdepim/ktimetracker/pics/watch-0.xpm?view=log
-static char * watch_0_xpm[] = {
+static const char * watch_0_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
@@ -197,7 +197,7 @@ static char * watch_0_xpm[] = {
 "   $%%%%%%%$   ",
 "    +@#%#@+    "};
 /* XPM */
-static char * watch_1_xpm[] = {
+static const char * watch_1_xpm[] = {
 "15 13 7 1",
 " 	c None",
 ".	c #000000",
@@ -219,7 +219,7 @@ static char * watch_1_xpm[] = {
 "  %$$$$$$$$$%  ",
 "   %$$$$$$$%   ",
 "    +@#$#@+    "};
-static char * watch_2_xpm[] = {
+static const char * watch_2_xpm[] = {
 "15 13 7 1",
 " 	c None",
 ".	c #000000",
@@ -241,7 +241,7 @@ static char * watch_2_xpm[] = {
 "  %$$$$$$$$$%  ",
 "   %$$$$$$$%   ",
 "    +@#$#@+    "};
-static char * watch_3_xpm[] = {
+static const char * watch_3_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
@@ -263,7 +263,7 @@ static char * watch_3_xpm[] = {
 "  %$$$$$$$$.%  ",
 "   %$$$$$$$%   ",
 "    +@#$#@+    "};
-static char * watch_4_xpm[] = {
+static const char * watch_4_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
@@ -285,7 +285,7 @@ static char * watch_4_xpm[] = {
 "  %$$$$.$$$$%  ",
 "   %$$$.$$$%   ",
 "    +@#.#@+    "};
-static char * watch_5_xpm[] = {
+static const char * watch_5_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
@@ -307,7 +307,7 @@ static char * watch_5_xpm[] = {
 "  %.$$$$$$$$%  ",
 "   %$$$$$$$%   ",
 "    +@#$#@+    "};
-static char * watch_6_xpm[] = {
+static const char * watch_6_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
@@ -329,7 +329,7 @@ static char * watch_6_xpm[] = {
 "  %$$$$$$$$$%  ",
 "   %$$$$$$$%   ",
 "    +@#$#@+    "};
-static char * watch_7_xpm[] = {
+static const char * watch_7_xpm[] = {
 "15 13 7 1",
 "       c None",
 ".      c #000000",
