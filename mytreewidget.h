@@ -7,7 +7,7 @@
 class mytreewidget : public QTreeWidget {
     Q_OBJECT
 public:
-    mytreewidget(QWidget *parent = 0){};
+    mytreewidget(QWidget * = 0){};
     ~mytreewidget(){};
     void mouseDoubleClickEvent(QMouseEvent *event) {emit mousedoubleclicked(event);QTreeWidget::mouseDoubleClickEvent(event);}
 
