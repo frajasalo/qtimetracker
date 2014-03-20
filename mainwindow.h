@@ -44,12 +44,18 @@ private:
     QIcon qi_watch[8];
     QIcon qi_complete;
     int oldtimeinseconds; // remember "time" column when task was started
-    static const int coltaskname=1;
-    static const int coltimericon=2;
-    static const int coltime=3;
-    static const int collaststart=4;
-    static const int collasttime=5;
-    static const int colcomplete=0;
+    /** \brief column number for the task name */
+    static const int coltaskname = 1;
+    /** \brief column number for the timer icon */
+    static const int coltimericon = 2;
+    /** \brief column number for displaying the time */
+    static const int coltime = 3;
+    /** \brief column number for remembering the last start time when a task is running */
+    static const int collaststart = 4;
+    /** \brief column number for storing the display time (coltime) of the last start */
+    static const int collasttime = 5;
+    /** \brief column number for marking a task as completed (icon) */
+    static const int colcomplete = 0;
 
 private slots:
     QString save();
