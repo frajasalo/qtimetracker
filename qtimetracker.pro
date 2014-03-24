@@ -11,10 +11,12 @@ TARGET = qtimetracker
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    taskdialog.cpp
+    taskdialog.cpp \
+    storagesimpletext.cpp
 HEADERS += mainwindow.h \
     taskdialog.h \
-    mytreewidget.h
+    mytreewidget.h \
+    storagesimpletext.h \
     storage.h
 FORMS += mainwindow.ui \
     taskdialog.ui
