@@ -15,6 +15,7 @@ SOURCES += main.cpp \
 HEADERS += mainwindow.h \
     taskdialog.h \
     mytreewidget.h
+    storage.h
 FORMS += mainwindow.ui \
     taskdialog.ui
 
@@ -23,6 +24,8 @@ INSTALLS += target
 
 RESOURCES += \
     qtimetrackerresourcefile.qrc
+
+QMAKE_CXXFLAGS += -std=c++11
 
 # Version information for qtimetracker
 VERSION = 0.0.0.0
