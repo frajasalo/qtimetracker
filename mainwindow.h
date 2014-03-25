@@ -24,6 +24,7 @@
 #include <QMainWindow>
 #include <QModelIndex>
 #include <QTimer>
+#include "storagesimpletext.h"
 
 namespace Ui {
     class MainWindow;
@@ -56,6 +57,9 @@ private:
     static const int collasttime = 5;
     /** \brief column number for marking a task as completed (icon) */
     static const int colcomplete = 0;
+    static const int coltaskid = 6;
+    IStorage *store;
+
 
 private slots:
     QString save();

@@ -355,7 +355,8 @@ static const char * watch_7_xpm[] = {
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    oldtimeinseconds(-1)
+    oldtimeinseconds(-1),
+    store(new StorageSimpleText)
 {
     ui->setupUi(this);
     connect(ui->treeWidget, SIGNAL(mousedoubleclicked(QMouseEvent*)),this,SLOT(on_mousedoubleclick(QMouseEvent*)));
@@ -382,9 +383,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->treeWidget->header()->resizeSection(coltime,120);
     ui->treeWidget->header()->resizeSection(colcomplete,20);
     ui->treeWidget->setRootIsDecorated(false);
-    ui->treeWidget->setColumnCount(6);
+    ui->treeWidget->setColumnCount(7);
     ui->treeWidget->setColumnHidden(collaststart,true);
     ui->treeWidget->setColumnHidden(collasttime,true);
+    ui->treeWidget->setColumnHidden(coltaskid,true);
     QTreeWidgetItem *item1 = ui->treeWidget->headerItem();
 /* For Qt5, QApplication::UnicodeUTF8 is obsolate and QTreeWidgetItem::setText() has only 2 parameters. */
 #if (QT_VERSION >= 0x050000)
@@ -471,8 +473,10 @@ void MainWindow::slotaddtask()
     taskdialog->exec();
     if (taskdialog->hasaccepted())
     {
+        uint32_t new_task_id = store->AddTask(taskdialog->text().toStdString());
         ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(QStringList(QString())));
-        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskname,taskdialog->text());
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskname, store->GetTaskName(new_task_id).c_str());
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskid, QString::number(new_task_id));
         ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setFlags(ui->treeWidget->topLevelItem((ui->treeWidget->topLevelItemCount()-1))->flags() | Qt::ItemIsEditable);
         /* HINT: When compiling for Qt5 this is necesarry or nothing is shown in the time column. */
         ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(this->coltime, "00:00:00");
@@ -537,7 +541,13 @@ void MainWindow::slotstoptiming()
         { // task is really running
             timer->stop();
             ui->treeWidget->currentItem()->setIcon(coltimericon,QIcon());
-            ui->treeWidget->currentItem()->setText(collaststart,QString()); // mark task as not running
+            /* update the store to give a chance to save period */
+            uint32_t task_id = ui->treeWidget->currentItem()->text(coltaskid).toUInt();
+            uint task_start = ui->treeWidget->currentItem()->text(collaststart).toUInt();
+            uint task_end = QDateTime::currentDateTime().toTime_t();
+            store->AddTaskPeriod(task_id, task_start, task_end);
+            /* mark task as not running */
+            ui->treeWidget->currentItem()->setText(collaststart,QString());
         }
         save();
     }
@@ -546,12 +556,18 @@ void MainWindow::slotstoptiming()
 void MainWindow::stopalltimers()
 {
     timer->stop();
-    for (int i=0; i<taskcount(); i=i+1)
+    for (int i = 0; i < taskcount(); ++i)
     {
         if (!ui->treeWidget->topLevelItem(i)->text(collaststart).isEmpty())
         { // task is really running
             ui->treeWidget->topLevelItem(i)->setIcon(coltimericon,QIcon());
-            ui->treeWidget->topLevelItem(i)->setText(collaststart,QString()); // mark task as not running
+            /* update the store to give a chance to save period */
+            uint32_t task_id = ui->treeWidget->topLevelItem(i)->text(coltaskid).toUInt();
+            uint task_start = ui->treeWidget->topLevelItem(i)->text(collaststart).toUInt();
+            uint task_end = QDateTime::currentDateTime().toTime_t();
+            store->AddTaskPeriod(task_id, task_start, task_end);
+            /* mark task as not running */
+            ui->treeWidget->topLevelItem(i)->setText(collaststart,QString());
         }
     }
     save();
@@ -560,6 +576,8 @@ void MainWindow::stopalltimers()
 void MainWindow::slotdeletetask()
 {
     slotstoptiming();
+    uint32_t del_task_id = ui->treeWidget->currentItem()->text(coltaskid).toUInt();
+    store->DelTask(del_task_id);
     delete(ui->treeWidget->currentItem());
     save();
 }
@@ -580,59 +598,60 @@ void MainWindow::slottimer()
     ui->treeWidget->topLevelItem(runningtaskindex())->setText(coltime, timestring(curr_time));
 }
 
-QString MainWindow::save()
-{
-    QString err;
-    int i;
-    QFile file1(QString("qtimetracker.txt"));
-    if (!file1.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text)) err=QString("Could not open file");
-    else
-    {
-        for (i=0; i<ui->treeWidget->topLevelItemCount(); i=i+1)
-        {
-            file1.write(ui->treeWidget->topLevelItem(i)->text(coltaskname).append("\n").toUtf8());
-            file1.write(ui->treeWidget->topLevelItem(i)->text(coltime).append("\n").toUtf8());
-            if (ui->treeWidget->topLevelItem(i)->icon(colcomplete).isNull())
-            {
-                file1.write("incomplete\n");
-            }
-            else file1.write("complete\n");
-        }
-        file1.close();
-        ui->statusBar->showMessage(QString("saved tasks:").append(QString::number((double)i)));
+/** @brief Save all tasks to the store
+ *  @return Empty string for success or an error message.
+ *
+ * The function iterates over the tree widgets content and collects the
+ * infomations of the tasks into a std::vector.
+ * This vector is the argument for the Save() function of the store.
+ */
+QString MainWindow::save() {
+
+    std::vector<task_t> v;
+    for (int i = 0; i < ui->treeWidget->topLevelItemCount(); ++i) {
+        task_t t;
+        t.id = ui->treeWidget->topLevelItem(i)->text(coltaskid).toUInt();
+        t.parent = 0;
+        t.time = ui->treeWidget->topLevelItem(i)->text(coltime).toStdString();
+        if (ui->treeWidget->topLevelItem(i)->icon(colcomplete).isNull())
+            t.complete = false;
+        else
+            t.complete = true;
+        v.push_back(t);
     }
-    return err;
+    return QString(store->Save(v).c_str());
 }
 
-QString MainWindow::load()
-{
-    QString err;
-    QFile file1(QString("qtimetracker.txt"));
-    if (!file1.open(QIODevice::ReadOnly | QIODevice::Text)) err=QString("Could not open file");
-    else
-    {
-        QByteArray line;
-        int i=0;
-        while (!file1.atEnd())
-        {
-            line=file1.readLine();
-            line.replace("\n","");
-            ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(QStringList(QString())));
-            ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskname,line);
-            ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setFlags(ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->flags()|Qt::ItemIsEditable);
-            line=file1.readLine();
-            line.replace("\n","");
-            ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltime,line);
-            line=file1.readLine();
-            if (line=="complete\n")
-            {
-                ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setIcon(colcomplete,qi_complete);
-                ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setData(colcomplete,Qt::DisplayRole,QVariant(" "));
-            }
-            i++;
-        }
-        file1.close();
-    }
+/** @brief Load the tasks from the store into the tree widget
+ *  @return Empty string for success or an error message
+ *
+ * The store provides a std::vector of all tasks.
+ * From the content of this vector the functions fills the tree widget
+ */
+QString MainWindow::load() {
+
+    std::vector<task_t> tasks;
+    QString err = QString(store->Load(tasks).c_str());
+    if ("" != err)  return err;
+
+    /* Lambda function for adding a task to the tree widget */
+    auto add_task_func = [&] (task_t t) -> void {
+        /* for each task add a new item to the tree widget */
+        ui->treeWidget->addTopLevelItem(new QTreeWidgetItem(QStringList(QString())));
+        /* fill the new item with task's id, name, time and "complete" */
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskid, QString::number(t.id));
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltaskname, store->GetTaskName(t.id).c_str());
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setText(coltime, QString(t.time.c_str()));
+        if (t.complete)
+            ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setIcon(colcomplete, qi_complete);
+        else
+            ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setData(colcomplete, Qt::DisplayRole,QVariant(" "));
+        /** @todo (Frank Bergmann, 25.3.2014) Make the item editable ? */
+        ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->setFlags(ui->treeWidget->topLevelItem(ui->treeWidget->topLevelItemCount()-1)->flags()|Qt::ItemIsEditable);
+
+    };
+    for_each(tasks.begin(), tasks.end(), add_task_func);
+    /* err should be an empty string */
     return err;
 }
 
