@@ -15,7 +15,7 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += tst_storagesimple_unittest.cpp ../../storagesimpletext.cpp
+SOURCES += tst_storagesimple_unittest.cpp ../../storagesimpletext.cpp ../../storageoptions.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 QMAKE_CXXFLAGS += -std=c++11
