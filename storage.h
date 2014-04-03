@@ -26,6 +26,8 @@
 #include <stdint.h>
 #include <time.h>
 
+#include "storageoptions.h"
+
 /** @brief Type for the entries in the task list interface */
 typedef struct {
     /** @brief The ID of task */
@@ -44,7 +46,7 @@ typedef struct {
  * This class works as an interface for storing tasks and time and or time
  * periods spending work on the tasks.
  */
-class IStorage {
+class IStorage : public IStorageOptions {
 public:
     virtual ~IStorage() {}
     /** @brief Saving the tasks and times to the storage backend */
