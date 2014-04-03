@@ -27,7 +27,17 @@
  *
  * The default filename is the original one from qtimetracker.
  */
-StorageSimpleText::StorageSimpleText() : m_FileName("qtimetracker.txt") {}
+StorageSimpleText::StorageSimpleText() {
+    /* add an option for the filename */
+    StoreOption_t opt_filename;
+    opt_filename.name = "Filename";
+    opt_filename.value = "qtimetracker.txt";
+    opt_filename.conf_text = "Filename for the storage file.";
+    opt_filename.help_text = "This is the filename for the text file that will \
+            contain all the tasks in textual form. If you want to use a \
+            central file set an absolute path to the file.";
+    AddOption(opt_filename);
+}
 
 /** @brief Set the filename for storage file
  *  @param filename The new filename or an empty string for querying the current one
@@ -38,8 +48,8 @@ StorageSimpleText::StorageSimpleText() : m_FileName("qtimetracker.txt") {}
 std::string StorageSimpleText::SetFileName(std::string filename/* = ""*/) {
 
     if (!filename.empty())
-        m_FileName = filename;
-    return m_FileName;
+        SetOptionValue("Filename", filename);
+    return GetOptionValue("Filename");
 }
 
 /** @brief Save a vector of tasks.
@@ -49,7 +59,7 @@ std::string StorageSimpleText::SetFileName(std::string filename/* = ""*/) {
 std::string StorageSimpleText::Save(const std::vector<task_t> &v) {
 
     std::ofstream ofs;
-    ofs.open(m_FileName.c_str(), std::ofstream::out | std::ofstream::trunc);
+    ofs.open(GetOptionValue("Filename").c_str(), std::ofstream::out | std::ofstream::trunc);
 
     if (!ofs.is_open())
         return std::string("could not open file for writing");
@@ -79,7 +89,7 @@ std::string StorageSimpleText::Save(const std::vector<task_t> &v) {
 std::string StorageSimpleText::Load(std::vector<task_t> &v) {
 
     std::ifstream ifs;
-    ifs.open(m_FileName.c_str(), std::ifstream::in);
+    ifs.open(GetOptionValue("Filename").c_str(), std::ifstream::in);
 
     if (!ifs.is_open())
         return std::string("could not open file for reading");

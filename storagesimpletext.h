@@ -52,7 +52,6 @@ public:
     bool DelTask(uint32_t);
 
 private:
-    std::string m_FileName;
     std::map<uint32_t, std::string> m_IdNameMap;
 };
 
