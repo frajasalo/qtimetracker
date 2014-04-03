@@ -12,12 +12,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
     taskdialog.cpp \
-    storagesimpletext.cpp
+    storagesimpletext.cpp \
+    storageoptions.cpp
 HEADERS += mainwindow.h \
     taskdialog.h \
     mytreewidget.h \
     storagesimpletext.h \
-    storage.h
+    storage.h \
+    storageoptions.h
 FORMS += mainwindow.ui \
     taskdialog.ui
 
